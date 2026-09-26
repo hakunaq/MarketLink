@@ -1,0 +1,86 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+<h2 class="section-title mb-3"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</h2>
+<partial name="_AdminNav" />
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="ml-stat"><div class="stat-value">@Model.TotalFarmers</div><div class="stat-label">Approved Farmers</div></div></div>
+    <div class="col-6 col-md-3"><div class="ml-stat amber"><div class="stat-value">@Model.TotalCustomers</div><div class="stat-label">Customers</div></div></div>
+    <div class="col-6 col-md-3"><div class="ml-stat blue"><div class="stat-value">@Model.TotalMarkets</div><div class="stat-label">Markets</div></div></div>
+    <div class="col-6 col-md-3"><div class="ml-stat grey"><div class="stat-value">@Model.TotalOrders</div><div class="stat-label">Orders</div></div></div>
+    <div class="col-6 col-md-3"><div class="ml-stat"><div class="stat-value">@Model.TotalProducts</div><div class="stat-label">Products</div></div></div>
+    <div class="col-6 col-md-3"><div class="ml-stat blue"><div class="stat-value">@Model.TotalRevenue.ToString("0.00")</div><div class="stat-label">Revenue</div></div></div>
+    <div class="col-6 col-md-3"><div class="ml-stat amber"><div class="stat-value">@Model.PendingFarmers</div><div class="stat-label">Pending Approvals</div></div></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header bg-white fw-bold">Recent orders</div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0 align-middle">
+                    <thead class="table-light"><tr><th>Order</th><th>Customer</th><th>Farmer</th><th>Total</th><th>Status</th></tr></thead>
+                    <tbody>
+                        @foreach (var o in Model.RecentOrders)
+                        {
+                            <tr>
+                                <td>#@o.Id</td>
+                                <td class="small">@o.Customer?.FullName</td>
+                                <td class="small">@o.Farmer?.StallName</td>
+                                <td class="small">@o.TotalAmount.ToString("0.00")</td>
+                                <td><partial name="_OrderStatusBadge" model="o.Status" /></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card mb-3">
+            <div class="card-header bg-white fw-bold">Farmers awaiting approval</div>
+            <div class="card-body">
+                @if (Model.FarmersAwaitingApproval.Count == 0)
+                {
+                    <p class="small text-muted mb-0">No pending farmers.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var f in Model.FarmersAwaitingApproval)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div class="small">
+                                    <strong>@f.StallName</strong><br />
+                                    <span class="text-muted">@f.Email</span>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <form asp-action="ApproveFarmer" asp-route-id="@f.FarmerProfileId" method="post">@Html.AntiForgeryToken()
+                                        <button class="btn btn-sm btn-success">Approve</button></form>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                    <a asp-action="Farmers" class="btn btn-sm btn-outline-success mt-2">Manage all farmers</a>
+                }
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-white fw-bold">Most active farmers</div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Farmer</th><th>Orders</th><th>Revenue</th></tr></thead>
+                    <tbody>
+                        @foreach (var t in Model.MostActiveFarmers)
+                        {
+                            <tr><td class="small">@t.StallName</td><td>@t.OrderCount</td><td>@t.Revenue.ToString("0.00")</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

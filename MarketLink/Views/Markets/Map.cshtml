@@ -1,0 +1,68 @@
+@model List<Market>
+@using System.Globalization
+@{
+    ViewData["Title"] = "Market Map";
+    var farmers = (List<FarmerProfile>)ViewBag.Farmers;
+    var inv = CultureInfo.InvariantCulture;
+}
+<h2 class="section-title mb-3"><i class="bi bi-geo-alt me-2"></i>Markets & Stalls Map</h2>
+<p class="text-muted small">Green pins are markets; orange pins are farmer stalls. Click a pin for details and directions.</p>
+
+<div id="all-map" class="ml-map" style="height:520px"></div>
+
+<div class="row g-4 mt-2">
+    <div class="col-md-6">
+        <h6 class="fw-bold">Markets (@Model.Count)</h6>
+        <ul class="list-group list-group-flush small">
+            @foreach (var m in Model)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-shop text-success me-1"></i>@m.Name — @m.OperatingDays</span>
+                    <a asp-action="Details" asp-route-id="@m.Id">details</a>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <h6 class="fw-bold">Farmer stalls (@farmers.Count)</h6>
+        <ul class="list-group list-group-flush small">
+            @foreach (var f in farmers)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-geo-alt-fill text-warning me-1"></i>@f.StallName</span>
+                    <a asp-controller="Farmers" asp-action="Details" asp-route-id="@f.Id">visit</a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const markers = [
+            @foreach (var m in Model)
+            {
+                <text>
+                {
+                    lat: @m.Latitude.ToString(inv), lng: @m.Longitude.ToString(inv),
+                    title: "@m.Name", subtitle: "Market — @m.OperatingDays, @m.OpenTime–@m.CloseTime",
+                    icon: "bi-shop", color: "#2e7d32",
+                    link: "https://www.openstreetmap.org/?mlat=@m.Latitude.ToString(inv)&mlon=@m.Longitude.ToString(inv)#map=17/@m.Latitude.ToString(inv)/@m.Longitude.ToString(inv)"
+                },
+                </text>
+            }
+            @foreach (var f in farmers)
+            {
+                <text>
+                {
+                    lat: @f.Latitude.ToString(inv), lng: @f.Longitude.ToString(inv),
+                    title: "@f.StallName", subtitle: "@(f.AddressText ?? f.ContactPerson)",
+                    icon: "bi-geo-alt-fill", color: "#fb8c00",
+                    link: "https://www.openstreetmap.org/?mlat=@f.Latitude.ToString(inv)&mlon=@f.Longitude.ToString(inv)#map=17/@f.Latitude.ToString(inv)/@f.Longitude.ToString(inv)"
+                },
+                </text>
+            }
+        ];
+        initLeafletMap("all-map", markers);
+    </script>
+}

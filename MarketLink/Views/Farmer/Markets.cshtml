@@ -1,0 +1,97 @@
+@model List<FarmerMarket>
+@{
+    ViewData["Title"] = "Market Schedule";
+    var allMarkets = (List<Market>)ViewBag.AllMarkets;
+    var days = (string[])ViewBag.Days;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="section-title mb-0"><i class="bi bi-calendar-week me-2"></i>Market Schedule</h2>
+    <a asp-action="Index" class="btn btn-sm btn-light border"><i class="bi bi-arrow-left"></i> Dashboard</a>
+</div>
+<p class="text-muted small">Tell customers which markets you attend, on which days, and your pickup window.</p>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header bg-white fw-bold">Your current schedule</div>
+            @if (Model.Count == 0)
+            {
+                <div class="card-body"><p class="text-muted small mb-0">No markets added yet.</p></div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table mb-0 align-middle">
+                        <thead class="table-light"><tr><th>Market</th><th>Day</th><th>Window</th><th>Stall</th><th></th></tr></thead>
+                        <tbody>
+                            @foreach (var fm in Model)
+                            {
+                                <tr>
+                                    <td>@fm.Market?.Name</td>
+                                    <td>@fm.OperatingDay</td>
+                                    <td class="small">@fm.PickupStartTime – @fm.PickupEndTime</td>
+                                    <td class="small">@(fm.StallNumber ?? "-")</td>
+                                    <td class="text-end">
+                                        <form asp-action="RemoveMarket" asp-route-id="@fm.Id" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3">Add a market day</h6>
+                <form asp-action="AddMarket" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-2">
+                        <label class="form-label small">Market</label>
+                        <select name="marketId" class="form-select form-select-sm" required>
+                            <option value="">Choose a market...</option>
+                            @foreach (var m in allMarkets)
+                            {
+                                <option value="@m.Id">@m.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">Operating day</label>
+                        <select name="operatingDay" class="form-select form-select-sm" required>
+                            @foreach (var d in days)
+                            {
+                                <option value="@d">@d</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <label class="form-label small">Pickup from</label>
+                            <input type="time" name="pickupStart" value="08:00" class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small">Pickup to</label>
+                            <input type="time" name="pickupEnd" value="13:00" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Stall number / spot</label>
+                        <input type="text" name="stallNumber" class="form-control form-control-sm" placeholder="e.g. Stall 4" />
+                    </div>
+                    <button class="btn btn-green btn-sm w-100"><i class="bi bi-plus-circle"></i> Add to schedule</button>
+                </form>
+            </div>
+        </div>
+        <div class="alert alert-light border small mt-3 mb-0">
+            <i class="bi bi-info-circle me-1"></i>
+            Can't find your market? Ask an administrator to add it under <em>Manage Markets</em>.
+        </div>
+    </div>
+</div>

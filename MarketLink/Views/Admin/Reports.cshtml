@@ -1,0 +1,115 @@
+@using MarketLink.Models.ViewModels
+@{
+    ViewData["Title"] = "Reports";
+    string? type = ViewBag.Type;
+    var orders = (List<Order>?)ViewBag.Orders;
+    var revenueByMarket = ViewBag.RevenueByMarket as List<MarketRevenueRow>;
+    var topFarmers = ViewBag.TopFarmers as List<TopFarmerRow>;
+    var history = (List<PlatformReport>)ViewBag.History;
+}
+<h2 class="section-title mb-3"><i class="bi bi-graph-up me-2"></i>Reports & Analytics</h2>
+<partial name="_AdminNav" />
+
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <form asp-action="Reports" method="get" class="d-inline">
+        <input type="hidden" name="type" value="orders" />
+        <button class="btn btn-sm btn-light border"><i class="bi bi-receipt"></i> All Orders</button>
+    </form>
+    <form asp-action="GenerateReport" asp-route-type="revenue" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <button class="btn btn-sm btn-light border"><i class="bi bi-cash-stack"></i> Revenue by Market</button>
+    </form>
+    <form asp-action="GenerateReport" asp-route-type="farmers" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <button class="btn btn-sm btn-light border"><i class="bi bi-trophy"></i> Most Active Farmers</button>
+    </form>
+    <form asp-action="GenerateReport" asp-route-type="orders" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <button class="btn btn-sm btn-light border"><i class="bi bi-file-earmark-text"></i> Orders Report</button>
+    </form>
+</div>
+
+@if (type == "orders" && orders != null)
+{
+    <div class="card mb-4">
+        <div class="card-header bg-white fw-bold">All orders (@orders.Count)</div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0 align-middle">
+                <thead class="table-light"><tr><th>Order</th><th>Customer</th><th>Farmer</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
+                <tbody>
+                    @foreach (var o in orders)
+                    {
+                        <tr>
+                            <td>#@o.Id</td>
+                            <td class="small">@o.Customer?.FullName</td>
+                            <td class="small">@o.Farmer?.StallName</td>
+                            <td class="small">@o.OrderDate.ToString("dd MMM yyyy")</td>
+                            <td class="small">@o.TotalAmount.ToString("0.00")</td>
+                            <td><partial name="_OrderStatusBadge" model="o.Status" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@if (type == "revenue" && revenueByMarket != null)
+{
+    <div class="card mb-4">
+        <div class="card-header bg-white fw-bold">Revenue by market (completed orders)</div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead class="table-light"><tr><th>Market</th><th>Orders</th><th>Revenue</th></tr></thead>
+                <tbody>
+                    @foreach (var row in revenueByMarket)
+                    {
+                        <tr>
+                            <td>@row.Market</td>
+                            <td>@row.Orders</td>
+                            <td>@row.Revenue.ToString("0.00")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@if (type == "farmers" && topFarmers != null)
+{
+    <div class="card mb-4">
+        <div class="card-header bg-white fw-bold">Most active farmers</div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead class="table-light"><tr><th>Farmer</th><th>Completed orders</th><th>Revenue</th></tr></thead>
+                <tbody>
+                    @foreach (var t in topFarmers)
+                    {
+                        <tr><td>@t.StallName</td><td>@t.OrderCount</td><td>@t.Revenue.ToString("0.00")</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@if (type == null)
+{
+    <div class="alert alert-light border">Choose a report above to generate and view it.</div>
+}
+
+<div class="card">
+    <div class="card-header bg-white fw-bold">Recently generated reports</div>
+    <div class="table-responsive">
+        <table class="table table-sm mb-0">
+            <thead class="table-light"><tr><th>Type</th><th>Generated at</th></tr></thead>
+            <tbody>
+                @foreach (var h in history)
+                {
+                    <tr><td class="small">@h.ReportType</td><td class="small">@h.GeneratedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

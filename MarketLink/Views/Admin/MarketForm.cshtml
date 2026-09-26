@@ -1,0 +1,91 @@
+@model Market
+@using System.Globalization
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Add Market" : "Edit Market";
+    var inv = CultureInfo.InvariantCulture;
+    bool isNew = Model.Id == 0;
+}
+<h2 class="section-title mb-3"><i class="bi bi-geo-alt me-2"></i>@(isNew ? "Add Market" : "Edit Market")</h2>
+<partial name="_AdminNav" />
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-body">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+                <form asp-action="@(isNew ? "CreateMarket" : "EditMarket")" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label asp-for="Name" class="form-label"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="MapProvider" class="form-label"></label>
+                            <select asp-for="MapProvider" class="form-select">
+                                <option>OpenStreetMap</option>
+                                <option>Google Maps</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Address" class="form-label"></label>
+                            <input asp-for="Address" class="form-control" />
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Latitude" class="form-label"></label>
+                            <input asp-for="Latitude" id="lat" class="form-control" step="0.000001" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Longitude" class="form-label"></label>
+                            <input asp-for="Longitude" id="lng" class="form-control" step="0.000001" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="OperatingDays" class="form-label"></label>
+                            <input asp-for="OperatingDays" class="form-control" placeholder="e.g. Saturday, Sunday" />
+                            <div class="form-text">Comma-separated days.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="OpenTime" class="form-label"></label>
+                            <input asp-for="OpenTime" type="time" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="CloseTime" class="form-label"></label>
+                            <input asp-for="CloseTime" type="time" class="form-control" />
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <div class="form-check">
+                                <input asp-for="IsActive" class="form-check-input" />
+                                <label asp-for="IsActive" class="form-check-label">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-green">@(isNew ? "Create market" : "Save changes")</button>
+                        <a asp-action="Markets" class="btn btn-light border">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="fw-bold mb-2">Preview location</h6>
+                <div id="market-map" class="ml-map ml-map-sm"></div>
+                <p class="small text-muted mt-2 mb-0">Enter coordinates above; the pin updates on save.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let lat = @Model.Latitude.ToString(inv);
+        let lng = @Model.Longitude.ToString(inv);
+        if (!lat && !lng) { lat = 12.9716; lng = 77.5946; }
+        initLeafletMap("market-map", [{ lat: lat, lng: lng, title: "@Model.Name", icon: "bi-shop" }], [lat, lng]);
+    </script>
+}

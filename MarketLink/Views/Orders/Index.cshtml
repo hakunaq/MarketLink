@@ -1,0 +1,46 @@
+@model List<Order>
+@{
+    ViewData["Title"] = "My Orders";
+}
+<h2 class="section-title mb-3"><i class="bi bi-bag-check me-2"></i>My Orders</h2>
+
+@if (Model.Count == 0)
+{
+    <div class="text-center py-5">
+        <i class="bi bi-receipt display-1 text-muted"></i>
+        <p class="text-muted mt-2">You haven't placed any orders yet.</p>
+        <a asp-controller="Products" asp-action="Index" class="btn btn-green">Start shopping</a>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead class="table-light">
+                    <tr><th>Order</th><th>Farmer</th><th>Pickup</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">#@o.Id</td>
+                            <td class="small">@o.Farmer?.StallName</td>
+                            <td class="small">@o.PickupDate.ToString("dd MMM yyyy")<br /><span class="text-muted">@o.PickupTimeSlot</span></td>
+                            <td class="small">@o.Items.Sum(i => i.Quantity)</td>
+                            <td class="fw-semibold">@o.TotalAmount.ToString("0.00")</td>
+                            <td><partial name="_OrderStatusBadge" model="o.Status" /></td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@o.Id" class="btn btn-sm btn-light border">View</a>
+                                <form asp-action="Reorder" asp-route-id="@o.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn btn-sm btn-outline-success" title="Reorder"><i class="bi bi-arrow-repeat"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

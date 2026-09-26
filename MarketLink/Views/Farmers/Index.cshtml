@@ -1,0 +1,61 @@
+@model List<FarmerProfile>
+@{
+    ViewData["Title"] = "Farmers";
+    var markets = (List<Market>)ViewBag.Markets;
+    string? search = ViewBag.Search;
+    int? marketId = ViewBag.MarketId;
+}
+<h2 class="section-title mb-3"><i class="bi bi-shop me-2"></i>Our Farmers</h2>
+
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-5">
+        <input type="text" name="search" value="@search" class="form-control" placeholder="Search by stall or name..." />
+    </div>
+    <div class="col-md-4">
+        <select name="marketId" class="form-select">
+            <option value="">All markets</option>
+            @foreach (var m in markets)
+            {
+                <option value="@m.Id" selected="@(marketId == m.Id)">@m.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3 d-grid">
+        <button class="btn btn-green"><i class="bi bi-search"></i> Search</button>
+    </div>
+</form>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-warning">No farmers match your search.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var f in Model)
+        {
+            var available = f.Products.Count(p => p.IsAvailable && p.StockQuantity > 0);
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center me-2"
+                                 style="width:44px;height:44px;font-weight:700">
+                                @f.StallName.Substring(0, 1)
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0">@f.StallName</h6>
+                                <small class="text-muted">@f.ContactPerson</small>
+                            </div>
+                        </div>
+                        <p class="small text-muted">@f.Bio</p>
+                        <p class="small mb-2">
+                            <span class="badge bg-success-subtle text-success-emphasis">@available items available</span>
+                        </p>
+                        <a asp-action="Details" asp-route-id="@f.Id" class="btn btn-sm btn-green">View stall</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,14 @@
+@model OrderStatus
+@{
+    var (css, icon, label) = Model switch
+    {
+        OrderStatus.Placed => ("bg-secondary", "bi-hourglass-split", "Placed"),
+        OrderStatus.Accepted => ("bg-info text-dark", "bi-check2-circle", "Accepted"),
+        OrderStatus.ReadyForPickup => ("bg-warning text-dark", "bi-bag-check", "Ready for pickup"),
+        OrderStatus.Completed => ("bg-success", "bi-clipboard-check", "Completed"),
+        OrderStatus.Cancelled => ("bg-dark", "bi-x-circle", "Cancelled"),
+        OrderStatus.Declined => ("bg-danger", "bi-slash-circle", "Declined"),
+        _ => ("bg-light text-dark", "bi-question", Model.ToString())
+    };
+}
+<span class="status-pill @css"><i class="bi @icon me-1"></i>@label</span>

@@ -1,0 +1,124 @@
+@model FarmerDashboardViewModel
+@{
+    ViewData["Title"] = "Farmer Dashboard";
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h2 class="section-title mb-0"><i class="bi bi-shop me-2"></i>@Model.Profile.StallName</h2>
+    <div>
+        @if (!Model.Profile.IsApproved)
+        {
+            <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> Awaiting admin approval</span>
+        }
+        else
+        {
+            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Approved</span>
+        }
+    </div>
+</div>
+
+@if (!Model.Profile.IsApproved)
+{
+    <div class="alert alert-warning">
+        <i class="bi bi-info-circle me-1"></i>
+        Your stall is pending approval. You can complete your profile and add products, but they won't be
+        visible to customers until an admin approves you.
+    </div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="ml-stat"><div class="stat-value">@Model.TotalOrders</div><div class="stat-label">Total Orders</div></div></div>
+    <div class="col-6 col-md-3"><div class="ml-stat amber"><div class="stat-value">@Model.PendingOrders</div><div class="stat-label">Pending Orders</div></div></div>
+    <div class="col-6 col-md-3"><div class="ml-stat blue"><div class="stat-value">@Model.TotalRevenue.ToString("0.00")</div><div class="stat-label">Revenue (completed)</div></div></div>
+    <div class="col-6 col-md-3"><div class="ml-stat grey"><div class="stat-value">@Model.ActiveProducts</div><div class="stat-label">Active Products</div></div></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="section-title mb-0">Recent pre-orders</h5>
+            <a asp-controller="FarmerOrders" asp-action="Index" class="small">Manage all</a>
+        </div>
+        @if (Model.RecentOrders.Count == 0)
+        {
+            <div class="alert alert-light border small">No orders yet. Add products so customers can pre-order.</div>
+        }
+        else
+        {
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0 align-middle">
+                        <thead class="table-light"><tr><th>Order</th><th>Pickup</th><th>Total</th><th>Status</th><th></th></tr></thead>
+                        <tbody>
+                            @foreach (var o in Model.RecentOrders)
+                            {
+                                <tr>
+                                    <td>#@o.Id</td>
+                                    <td class="small">@o.PickupDate.ToString("dd MMM")</td>
+                                    <td class="small">@o.TotalAmount.ToString("0.00")</td>
+                                    <td><partial name="_OrderStatusBadge" model="o.Status" /></td>
+                                    <td class="text-end"><a asp-controller="FarmerOrders" asp-action="Details" asp-route-id="@o.Id" class="btn btn-sm btn-light border">Open</a></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        <h5 class="section-title mt-4 mb-2">Best-selling products</h5>
+        @if (Model.BestSellers.Count == 0)
+        {
+            <p class="small text-muted">Sales appear here once orders are completed.</p>
+        }
+        else
+        {
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light"><tr><th>Product</th><th>Qty sold</th><th>Revenue</th></tr></thead>
+                        <tbody>
+                            @foreach (var b in Model.BestSellers)
+                            {
+                                <tr><td>@b.ProductName</td><td>@b.QuantitySold</td><td>@b.Revenue.ToString("0.00")</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3">Quick actions</h6>
+                <div class="d-grid gap-2">
+                    <a asp-controller="FarmerProducts" asp-action="Create" class="btn btn-green btn-sm"><i class="bi bi-plus-circle"></i> Add product</a>
+                    <a asp-controller="FarmerProducts" asp-action="Index" class="btn btn-outline-success btn-sm"><i class="bi bi-box-seam"></i> Manage stock</a>
+                    <a asp-controller="FarmerOrders" asp-action="Index" class="btn btn-outline-success btn-sm"><i class="bi bi-receipt"></i> Manage pre-orders</a>
+                    <a asp-action="Markets" class="btn btn-outline-success btn-sm"><i class="bi bi-calendar-week"></i> Market schedule</a>
+                    <a asp-action="Profile" class="btn btn-outline-success btn-sm"><i class="bi bi-pencil"></i> Edit profile</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0">Rating</h6>
+                    <span class="star">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <i class="bi @(i <= Math.Round(Model.AverageRating) ? "bi-star-fill" : "bi-star")"></i>
+                        }
+                    </span>
+                </div>
+                <p class="small text-muted mb-2">@(Model.AverageRating > 0 ? Model.AverageRating.ToString("0.0") + " / 5 average" : "No reviews yet")</p>
+                <a asp-action="Reviews" class="btn btn-sm btn-outline-success">View & respond to reviews</a>
+                <hr />
+                <p class="small mb-1"><i class="bi bi-box-seam text-danger me-1"></i>@Model.SoldOutProducts sold-out product(s)</p>
+                <p class="small mb-0"><i class="bi bi-star text-success me-1"></i>@Model.RecentReviews.Count recent review(s)</p>
+            </div>
+        </div>
+    </div>
+</div>

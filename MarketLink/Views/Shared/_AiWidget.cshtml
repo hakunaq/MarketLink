@@ -1,0 +1,30 @@
+@* Floating AI assistant chat widget. Talks to /Ai/Chat via fetch. *@
+<div id="ai-widget">
+    <button id="ai-toggle" class="btn btn-success rounded-circle shadow" title="Ask the assistant">
+        <i class="bi bi-chat-dots-fill"></i>
+    </button>
+
+    <div id="ai-panel" class="card shadow d-none">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-robot me-1"></i> MarketLink Assistant</span>
+            <button id="ai-close" class="btn-close btn-close-white" title="Close"></button>
+        </div>
+        <div id="ai-messages" class="p-3">
+            <div class="ai-msg ai-bot">
+                Hi! I can help you find products, check market timings, see which farmers are selling,
+                or explain how pre-orders and pickup work. What would you like to know?
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="d-flex gap-2">
+                <input id="ai-input" type="text" class="form-control form-control-sm" placeholder="Type a question..." />
+                <button id="ai-send" class="btn btn-success btn-sm"><i class="bi bi-send"></i></button>
+            </div>
+            <div class="mt-2 small text-muted">
+                Try: <a href="#" class="ai-suggest">market timings</a> ·
+                <a href="#" class="ai-suggest">who sells tomatoes</a> ·
+                <a href="#" class="ai-suggest">how do I pay</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+@model Product
+@{
+    ViewData["Title"] = "Delete Product";
+    bool hasOrders = ViewBag.HasOrders;
+}
+<h2 class="section-title mb-3"><i class="bi bi-trash me-2"></i>Delete Product</h2>
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <p>Are you sure you want to remove <strong>@Model.Name</strong>?</p>
+                @if (hasOrders)
+                {
+                    <div class="alert alert-warning small">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        This product is part of past orders, so it will be <strong>retired</strong> (hidden and zero stock)
+                        instead of deleted, to keep order history intact.
+                    </div>
+                }
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">@(hasOrders ? "Retire product" : "Delete permanently")</button>
+                    <a asp-action="Index" class="btn btn-light border">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

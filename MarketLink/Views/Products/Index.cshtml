@@ -1,0 +1,77 @@
+@model ProductFilterViewModel
+@{
+    ViewData["Title"] = "Products";
+}
+<h2 class="section-title mb-3"><i class="bi bi-basket me-2"></i>Browse Products</h2>
+
+<form method="get" class="card mb-4">
+    <div class="card-body">
+        <div class="row g-2">
+            <div class="col-md-3">
+                <label class="form-label small">Search</label>
+                <input type="text" name="SearchTerm" value="@Model.SearchTerm" class="form-control form-control-sm" placeholder="e.g. tomatoes" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Category</label>
+                <select name="CategoryId" asp-items="Model.Categories" class="form-select form-select-sm">
+                    <option value="">All</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Market</label>
+                <select name="MarketId" asp-items="Model.Markets" class="form-select form-select-sm">
+                    <option value="">All</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Day</label>
+                <select name="Day" class="form-select form-select-sm">
+                    <option value="">Any day</option>
+                    @foreach (var d in Model.Days)
+                    {
+                        <option value="@d" selected="@(Model.Day == d)">@d</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small">Price range</label>
+                <div class="d-flex gap-1">
+                    <input type="number" step="0.01" name="MinPrice" value="@Model.MinPrice" class="form-control form-control-sm" placeholder="Min" />
+                    <input type="number" step="0.01" name="MaxPrice" value="@Model.MaxPrice" class="form-control form-control-sm" placeholder="Max" />
+                </div>
+            </div>
+        </div>
+        <div class="row g-2 mt-1">
+            <div class="col-md-3">
+                <label class="form-label small">Sort by</label>
+                <select name="SortBy" class="form-select form-select-sm">
+                    <option value="newest" selected="@(Model.SortBy == "newest")">Newest</option>
+                    <option value="price_asc" selected="@(Model.SortBy == "price_asc")">Price: low to high</option>
+                    <option value="price_desc" selected="@(Model.SortBy == "price_desc")">Price: high to low</option>
+                    <option value="name" selected="@(Model.SortBy == "name")">Name A–Z</option>
+                </select>
+            </div>
+            <div class="col-md-9 d-flex align-items-end gap-2">
+                <button class="btn btn-green btn-sm"><i class="bi bi-funnel"></i> Apply filters</button>
+                <a asp-action="Index" class="btn btn-light border btn-sm">Reset</a>
+                <span class="ms-auto text-muted small">@Model.Products.Count result(s)</span>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.Products.Count == 0)
+{
+    <div class="alert alert-warning">No products match your filters. Try widening your search.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var p in Model.Products)
+        {
+            <div class="col-6 col-md-4 col-lg-3">
+                <partial name="_ProductCard" model="p" />
+            </div>
+        }
+    </div>
+}

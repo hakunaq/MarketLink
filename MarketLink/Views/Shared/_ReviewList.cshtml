@@ -1,0 +1,36 @@
+@model List<Review>
+@if (Model.Count == 0)
+{
+    <p class="text-muted small">No reviews yet.</p>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var r in Model)
+        {
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between">
+                    <strong class="small">@(r.Customer?.FullName ?? "Customer")</strong>
+                    <span class="star small">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <i class="bi @(i <= r.Rating ? "bi-star-fill" : "bi-star")"></i>
+                        }
+                    </span>
+                </div>
+                @if (r.Product != null)
+                {
+                    <div class="small text-muted">on @r.Product.Name</div>
+                }
+                <p class="small mb-1 mt-1">@r.Comment</p>
+                <div class="small text-muted">@r.ReviewDate.ToString("dd MMM yyyy")</div>
+                @if (!string.IsNullOrEmpty(r.FarmerReply))
+                {
+                    <div class="alert alert-light border mt-2 mb-0 small">
+                        <strong>Farmer replied:</strong> @r.FarmerReply
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}

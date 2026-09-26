@@ -1,0 +1,59 @@
+@model List<Review>
+@{
+    ViewData["Title"] = "Reviews";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="section-title mb-0"><i class="bi bi-star me-2"></i>Customer Reviews</h2>
+    <a asp-action="Index" class="btn btn-sm btn-light border"><i class="bi bi-arrow-left"></i> Dashboard</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-light border">No reviews yet.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var r in Model)
+        {
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <strong class="small">@(r.Customer?.FullName ?? "Customer")</strong>
+                            <span class="star small">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="bi @(i <= r.Rating ? "bi-star-fill" : "bi-star")"></i>
+                                }
+                            </span>
+                        </div>
+                        @if (r.Product != null)
+                        {
+                            <div class="small text-muted">on @r.Product.Name</div>
+                        }
+                        <p class="small mt-2 mb-1">@r.Comment</p>
+                        <div class="small text-muted mb-2">@r.ReviewDate.ToString("dd MMM yyyy")</div>
+
+                        @if (!string.IsNullOrEmpty(r.FarmerReply))
+                        {
+                            <div class="alert alert-light border small mb-0">
+                                <strong>Your reply:</strong> @r.FarmerReply
+                            </div>
+                        }
+                        else
+                        {
+                            <form asp-action="ReplyReview" asp-route-id="@r.Id" method="post">
+                                @Html.AntiForgeryToken()
+                                <div class="input-group input-group-sm">
+                                    <input type="text" name="farmerReply" class="form-control" placeholder="Write a reply..." required />
+                                    <button class="btn btn-green">Reply</button>
+                                </div>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

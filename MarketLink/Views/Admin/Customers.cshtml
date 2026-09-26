@@ -1,0 +1,45 @@
+@model List<ApplicationUser>
+@{
+    ViewData["Title"] = "Manage Customers";
+}
+<h2 class="section-title mb-3"><i class="bi bi-people me-2"></i>Manage Customers</h2>
+<partial name="_AdminNav" />
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+            <thead class="table-light">
+                <tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@u.FullName</td>
+                        <td class="small">@u.Email</td>
+                        <td class="small">@u.PhoneNumber</td>
+                        <td class="small">@u.CreatedAt.ToString("dd MMM yyyy")</td>
+                        <td>
+                            @if (u.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Deactivated</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <form asp-action="ToggleCustomer" asp-route-id="@u.Id" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-sm @(u.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                                    @(u.IsActive ? "Deactivate" : "Activate")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

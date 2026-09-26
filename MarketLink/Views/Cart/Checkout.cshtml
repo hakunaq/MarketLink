@@ -1,0 +1,80 @@
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+}
+<h2 class="section-title mb-3"><i class="bi bi-bag-check me-2"></i>Checkout</h2>
+<p class="text-muted small">
+    Your cart spans @Model.FarmerGroups.Count farmer(s), so we'll create one pre-order per farmer.
+    Choose a pickup option for each.
+</p>
+
+<div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+
+<form asp-action="ConfirmCheckout" method="post">
+    @Html.AntiForgeryToken()
+    <div class="row g-4">
+        <div class="col-lg-8">
+            @foreach (var group in Model.FarmerGroups)
+            {
+                <div class="card mb-3">
+                    <div class="card-header bg-white fw-bold"><i class="bi bi-shop text-success me-1"></i>@group.StallName</div>
+                    <div class="card-body">
+                        <ul class="list-unstyled small mb-3">
+                            @foreach (var item in group.Items)
+                            {
+                                <li class="d-flex justify-content-between">
+                                    <span>@item.ProductName × @item.Quantity @item.Unit</span>
+                                    <span>@item.LineTotal.ToString("0.00")</span>
+                                </li>
+                            }
+                        </ul>
+                        <div class="d-flex justify-content-between fw-bold mb-3">
+                            <span>Subtotal</span><span>@group.Subtotal.ToString("0.00")</span>
+                        </div>
+                        <label class="form-label small fw-semibold">Pickup market & window</label>
+                        <select name="chosenPickup" class="form-select form-select-sm" required>
+                            @if (group.PickupOptions == null || !group.PickupOptions.Any())
+                            {
+                                <option value="@group.FarmerProfileId:0">Farmer will confirm pickup details</option>
+                            }
+                            else
+                            {
+                                foreach (var opt in group.PickupOptions)
+                                {
+                                    <option value="@group.FarmerProfileId:@opt.Value">@opt.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Pickup details</h5>
+                    <div class="mb-3">
+                        <label asp-for="PickupDate" class="form-label small fw-semibold"></label>
+                        <input asp-for="PickupDate" type="date" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="PickupDate" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Note" class="form-label small fw-semibold">Note for farmers (optional)</label>
+                        <textarea asp-for="Note" class="form-control" rows="2"></textarea>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between fs-5 fw-bold mb-3">
+                        <span>Total</span><span>@Model.GrandTotal.ToString("0.00")</span>
+                    </div>
+                    <button type="submit" class="btn btn-green w-100">Place pre-order(s)</button>
+                    <p class="small text-muted mt-2 mb-0">Pay in person at pickup. You can cancel before the cut-off time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

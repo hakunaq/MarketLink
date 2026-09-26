@@ -1,0 +1,14 @@
+@* Shared admin navigation tabs. *@
+@{
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<ul class="nav nav-pills mb-4 flex-wrap gap-1">
+    <li class="nav-item"><a class="nav-link @(action == "Index" ? "active" : "")" asp-action="Index"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+    <li class="nav-item"><a class="nav-link @(action == "Farmers" ? "active" : "")" asp-action="Farmers"><i class="bi bi-shop"></i> Farmers</a></li>
+    <li class="nav-item"><a class="nav-link @(action == "Customers" ? "active" : "")" asp-action="Customers"><i class="bi bi-people"></i> Customers</a></li>
+    <li class="nav-item"><a class="nav-link @(action is "Markets" or "CreateMarket" or "EditMarket" ? "active" : "")" asp-action="Markets"><i class="bi bi-geo-alt"></i> Markets</a></li>
+    <li class="nav-item"><a class="nav-link @(action == "Moderation" ? "active" : "")" asp-action="Moderation"><i class="bi bi-shield-check"></i> Moderation</a></li>
+    <li class="nav-item"><a class="nav-link @(action == "Categories" ? "active" : "")" asp-action="Categories"><i class="bi bi-tags"></i> Categories</a></li>
+    <li class="nav-item"><a class="nav-link @(action == "Announcements" ? "active" : "")" asp-action="Announcements"><i class="bi bi-megaphone"></i> Announcements</a></li>
+    <li class="nav-item"><a class="nav-link @(action == "Reports" ? "active" : "")" asp-action="Reports"><i class="bi bi-graph-up"></i> Reports</a></li>
+</ul>

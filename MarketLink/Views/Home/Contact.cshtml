@@ -1,0 +1,38 @@
+@{
+    ViewData["Title"] = "Contact Us";
+}
+<div class="row g-4">
+    <div class="col-lg-5">
+        <h2 class="section-title mb-3"><i class="bi bi-envelope-fill me-2"></i>Contact Us</h2>
+        <div class="card">
+            <div class="card-body">
+                <h6 class="fw-bold">MarketLink Team</h6>
+                <p class="small mb-2"><i class="bi bi-geo-alt me-2 text-success"></i>Head Office, Town Square, Greenfield</p>
+                <p class="small mb-2"><i class="bi bi-telephone me-2 text-success"></i>+1 (555) 010-9999</p>
+                <p class="small mb-2"><i class="bi bi-envelope me-2 text-success"></i>hello@marketlink.com</p>
+                <p class="small mb-0"><i class="bi bi-clock me-2 text-success"></i>Support: Mon–Fri, 9:00–17:00</p>
+            </div>
+        </div>
+        <div class="alert alert-info mt-3 small">
+            <i class="bi bi-info-circle me-1"></i>
+            Questions about a specific order? Open it under <strong>My Orders</strong> — farmers respond there fastest.
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <h5 class="section-title mb-3">Find us on the map</h5>
+        <div id="contact-map" class="ml-map"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        initLeafletMap("contact-map", [
+            {
+                lat: 12.9811, lng: 77.5870,
+                title: "MarketLink Head Office",
+                subtitle: "Town Square, Greenfield",
+                link: "https://www.openstreetmap.org/?mlat=12.9811&mlon=77.5870#map=16/12.9811/77.5870"
+            }
+        ]);
+    </script>
+}

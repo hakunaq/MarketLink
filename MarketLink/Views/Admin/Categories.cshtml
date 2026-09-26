@@ -1,0 +1,58 @@
+@model List<Category>
+@{
+    ViewData["Title"] = "Categories";
+}
+<h2 class="section-title mb-3"><i class="bi bi-tags me-2"></i>Product Categories</h2>
+<partial name="_AdminNav" />
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table mb-0 align-middle">
+                    <thead class="table-light"><tr><th>Category</th><th>Description</th><th>Products</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var c in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold"><i class="bi @c.IconClass text-success me-1"></i>@c.Name</td>
+                                <td class="small text-muted">@c.Description</td>
+                                <td><span class="badge bg-light text-dark">@c.Products.Count</span></td>
+                                <td class="text-end">
+                                    <form asp-action="DeleteCategory" asp-route-id="@c.Id" method="post" class="d-inline"
+                                          onsubmit="return confirm('Delete this category?');">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn btn-sm btn-outline-danger" @(c.Products.Any() ? "disabled" : "")>Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3">Add category</h6>
+                <form asp-action="AddCategory" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-2">
+                        <label class="form-label small">Name</label>
+                        <input name="name" class="form-control form-control-sm" required />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">Description</label>
+                        <input name="description" class="form-control form-control-sm" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Icon class (Bootstrap Icons)</label>
+                        <input name="iconClass" class="form-control form-control-sm" placeholder="bi-flower1" />
+                    </div>
+                    <button class="btn btn-green btn-sm w-100"><i class="bi bi-plus-circle"></i> Add category</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

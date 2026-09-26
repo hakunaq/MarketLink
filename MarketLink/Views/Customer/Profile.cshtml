@@ -1,0 +1,57 @@
+@model ApplicationUser
+@{
+    ViewData["Title"] = "My Profile";
+}
+<h2 class="section-title mb-3"><i class="bi bi-gear me-2"></i>My Profile</h2>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Edit details</h5>
+                <form asp-action="Profile" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input value="@Model.Email" class="form-control" disabled />
+                        <div class="form-text">Email cannot be changed here.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Full name</label>
+                        <input name="fullName" value="@Model.FullName" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contact number</label>
+                        <input name="phoneNumber" value="@Model.PhoneNumber" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <textarea name="address" class="form-control" rows="2">@Model.Address</textarea>
+                    </div>
+                    <button class="btn btn-green">Save changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Account info</h5>
+                <p class="small mb-1"><strong>Member since:</strong> @Model.CreatedAt.ToString("dd MMM yyyy")</p>
+                <p class="small mb-1"><strong>Status:</strong>
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Deactivated</span>
+                    }
+                </p>
+                <p class="small mb-3"><strong>Role:</strong> <span class="badge bg-secondary">Customer</span></p>
+                <a asp-controller="Orders" asp-action="Index" class="btn btn-outline-success btn-sm"><i class="bi bi-bag-check"></i> My orders</a>
+                <a asp-controller="Customer" asp-action="Favorites" class="btn btn-outline-danger btn-sm"><i class="bi bi-heart"></i> Favorites</a>
+            </div>
+        </div>
+    </div>
+</div>

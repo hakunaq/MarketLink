@@ -1,0 +1,65 @@
+@model List<FarmerProfile>
+@{
+    ViewData["Title"] = "Manage Farmers";
+}
+<h2 class="section-title mb-3"><i class="bi bi-shop me-2"></i>Manage Farmers</h2>
+<partial name="_AdminNav" />
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+            <thead class="table-light">
+                <tr><th>Stall</th><th>Contact</th><th>Email</th><th>Registered</th><th>Status</th><th class="text-end">Actions</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var f in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@f.StallName</td>
+                        <td class="small">@f.ContactPerson<br /><span class="text-muted">@f.ContactNumber</span></td>
+                        <td class="small">@f.User?.Email</td>
+                        <td class="small">@f.CreatedAt.ToString("dd MMM yyyy")</td>
+                        <td>
+                            @if (f.IsSuspended)
+                            {
+                                <span class="badge bg-danger">Suspended</span>
+                            }
+                            else if (!f.IsApproved)
+                            {
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Approved</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (!f.IsApproved)
+                            {
+                                <form asp-action="ApproveFarmer" asp-route-id="@f.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn btn-sm btn-success">Approve</button>
+                                </form>
+                            }
+                            @if (f.IsApproved && !f.IsSuspended)
+                            {
+                                <form asp-action="SuspendFarmer" asp-route-id="@f.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn btn-sm btn-outline-danger">Suspend</button>
+                                </form>
+                            }
+                            @if (f.IsSuspended)
+                            {
+                                <form asp-action="ReinstateFarmer" asp-route-id="@f.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn btn-sm btn-outline-success">Reinstate</button>
+                                </form>
+                            }
+                            <a asp-controller="Farmers" asp-action="Details" asp-route-id="@f.Id" class="btn btn-sm btn-light border">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

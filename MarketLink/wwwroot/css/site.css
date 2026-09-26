@@ -1,0 +1,269 @@
+/* ==========================================================================
+   MarketLink — custom styles (green "eGreen Basket" farm theme)
+   ========================================================================== */
+
+:root {
+    --ml-green: #2e7d32;
+    --ml-green-dark: #1b5e20;
+    --ml-leaf: #66bb6a;
+    --ml-cream: #f6faf5;
+    --ml-amber: #ffb300;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--ml-cream);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    color: #26301f;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+a {
+    color: var(--ml-green);
+}
+
+/* ---- Navbar ---- */
+.ml-navbar {
+    background: linear-gradient(90deg, var(--ml-green-dark), var(--ml-green));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+}
+
+.ml-navbar .navbar-brand {
+    letter-spacing: .3px;
+}
+
+.ml-cart-badge {
+    font-size: .7rem;
+    vertical-align: top;
+}
+
+.ml-notif-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: .6rem;
+}
+
+/* ---- Hero ---- */
+.ml-hero {
+    background:
+        linear-gradient(rgba(27, 94, 32, .82), rgba(46, 125, 50, .82)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%232e7d32'/%3E%3C/svg%3E");
+    background-size: cover;
+    color: #fff;
+    border-radius: 0 0 1.25rem 1.25rem;
+    padding: 3.5rem 1rem;
+    text-align: center;
+}
+
+.ml-hero h1 {
+    font-weight: 800;
+}
+
+/* ---- Cards ---- */
+.card {
+    border: none;
+    border-radius: .85rem;
+    box-shadow: 0 2px 10px rgba(38, 48, 31, .08);
+}
+
+.ml-product-card {
+    transition: transform .15s ease, box-shadow .15s ease;
+    height: 100%;
+}
+
+.ml-product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 22px rgba(38, 48, 31, .16);
+}
+
+.ml-product-img {
+    height: 150px;
+    object-fit: cover;
+    width: 100%;
+    background: #eef4ec;
+    border-radius: .85rem .85rem 0 0;
+}
+
+.ml-price {
+    color: var(--ml-green-dark);
+    font-weight: 700;
+}
+
+.ml-badge-cat {
+    background: #e8f5e9;
+    color: var(--ml-green-dark);
+    border-radius: 999px;
+    font-size: .72rem;
+    padding: .15rem .6rem;
+}
+
+/* ---- Stat tiles ---- */
+.ml-stat {
+    border-radius: .85rem;
+    padding: 1.1rem;
+    color: #fff;
+    background: linear-gradient(135deg, var(--ml-green), var(--ml-leaf));
+}
+
+.ml-stat.amber {
+    background: linear-gradient(135deg, #f9a825, #ffca28);
+}
+
+.ml-stat.blue {
+    background: linear-gradient(135deg, #1565c0, #42a5f5);
+}
+
+.ml-stat.grey {
+    background: linear-gradient(135deg, #546e7a, #90a4ae);
+}
+
+.ml-stat .stat-value {
+    font-size: 1.9rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.ml-stat .stat-label {
+    font-size: .82rem;
+    opacity: .95;
+}
+
+/* ---- Maps ---- */
+.ml-map {
+    height: 420px;
+    width: 100%;
+    border-radius: .85rem;
+    z-index: 0;
+}
+
+.ml-map-sm {
+    height: 260px;
+}
+
+/* ---- Order status pills ---- */
+.status-pill {
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 600;
+    padding: .2rem .7rem;
+}
+
+/* ---- Footer ---- */
+.ml-footer {
+    background: var(--ml-green-dark);
+    color: #dcedc8;
+}
+
+.ml-footer a {
+    color: #dcedc8;
+    text-decoration: none;
+}
+
+.ml-footer a:hover {
+    color: #fff;
+}
+
+/* ---- AI assistant widget ---- */
+#ai-widget {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 1050;
+}
+
+#ai-toggle {
+    width: 56px;
+    height: 56px;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#ai-panel {
+    position: absolute;
+    right: 0;
+    bottom: 68px;
+    width: 320px;
+    max-width: 90vw;
+    border: none;
+    border-radius: .85rem;
+    overflow: hidden;
+}
+
+#ai-messages {
+    height: 280px;
+    overflow-y: auto;
+    background: #f7fbf6;
+}
+
+.ai-msg {
+    max-width: 85%;
+    margin-bottom: .5rem;
+    padding: .5rem .7rem;
+    border-radius: .8rem;
+    font-size: .85rem;
+    white-space: pre-wrap;
+    line-height: 1.35;
+}
+
+.ai-bot {
+    background: #e8f5e9;
+    border-bottom-left-radius: .15rem;
+}
+
+.ai-user {
+    background: var(--ml-green);
+    color: #fff;
+    margin-left: auto;
+    border-bottom-right-radius: .15rem;
+}
+
+.ai-suggest {
+    text-decoration: none;
+}
+
+/* ---- Misc helpers ---- */
+.btn-green {
+    background: var(--ml-green);
+    color: #fff;
+}
+
+.btn-green:hover {
+    background: var(--ml-green-dark);
+    color: #fff;
+}
+
+.section-title {
+    font-weight: 700;
+    color: var(--ml-green-dark);
+}
+
+.star {
+    color: var(--ml-amber);
+}
+
+.table > :not(caption) > * > * {
+    vertical-align: middle;
+}
+
+/* ---- Responsive tweaks ---- */
+@media (max-width: 576px) {
+    .ml-hero {
+        padding: 2rem .75rem;
+    }
+
+    #ai-panel {
+        width: 92vw;
+    }
+}

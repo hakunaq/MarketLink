@@ -1,0 +1,50 @@
+@model List<Market>
+@{
+    ViewData["Title"] = "Markets";
+    var days = (string[])ViewBag.Days;
+    string? currentDay = ViewBag.Day;
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h2 class="section-title mb-0"><i class="bi bi-shop me-2"></i>Farmers Markets</h2>
+    <a asp-action="Map" class="btn btn-outline-success btn-sm"><i class="bi bi-geo-alt"></i> View all on map</a>
+</div>
+
+<div class="mb-4">
+    <span class="text-muted small me-2">Filter by day:</span>
+    <a asp-action="Index" class="btn btn-sm @(currentDay == null ? "btn-green" : "btn-light border")">All</a>
+    @foreach (var d in days)
+    {
+        <a asp-action="Index" asp-route-day="@d"
+           class="btn btn-sm @(currentDay == d ? "btn-green" : "btn-light border")">@d</a>
+    }
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-warning">No markets found for this filter.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var m in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="fw-bold"><i class="bi bi-shop text-success me-1"></i>@m.Name</h5>
+                        <p class="small text-muted mb-2"><i class="bi bi-geo-alt me-1"></i>@m.Address</p>
+                        <p class="small mb-1"><span class="badge bg-success-subtle text-success-emphasis">@m.OperatingDays</span></p>
+                        <p class="small mb-3"><i class="bi bi-clock me-1"></i>@m.OpenTime – @m.CloseTime</p>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Details" asp-route-id="@m.Id" class="btn btn-sm btn-green">View farmers</a>
+                            <a class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener"
+                               href="https://www.openstreetmap.org/directions?to=@m.Latitude,@m.Longitude">
+                                <i class="bi bi-signpost-2"></i> Directions
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

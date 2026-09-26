@@ -1,0 +1,80 @@
+@model List<Review>
+@{
+    ViewData["Title"] = "Content Moderation";
+    var products = (List<Product>)ViewBag.Products;
+}
+<h2 class="section-title mb-3"><i class="bi bi-shield-check me-2"></i>Content Moderation</h2>
+<partial name="_AdminNav" />
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <h5 class="fw-bold mb-2">Reviews (@Model.Count)</h5>
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-sm mb-0 align-middle">
+                    <thead class="table-light"><tr><th>By / Target</th><th>Rating</th><th>Comment</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var r in Model)
+                        {
+                            <tr class="@(r.IsHidden ? "table-warning" : "")">
+                                <td class="small">
+                                    <strong>@(r.Customer?.FullName ?? "User")</strong><br />
+                                    <span class="text-muted">@(r.Product?.Name ?? r.Farmer?.StallName ?? "Farmer")</span>
+                                </td>
+                                <td class="small star">@r.Rating <i class="bi bi-star-fill"></i></td>
+                                <td class="small">@r.Comment</td>
+                                <td class="text-end">
+                                    <form asp-action="ToggleReviewHidden" asp-route-id="@r.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn btn-sm @(r.IsHidden ? "btn-outline-success" : "btn-outline-danger")">
+                                            @(r.IsHidden ? "Restore" : "Hide")
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <h5 class="fw-bold mb-2">Product listings (@products.Count)</h5>
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-sm mb-0 align-middle">
+                    <thead class="table-light"><tr><th>Product</th><th>Farmer</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var p in products)
+                        {
+                            <tr>
+                                <td class="small fw-semibold">@p.Name</td>
+                                <td class="small">@p.Farmer?.StallName</td>
+                                <td>
+                                    @if (!p.IsAvailable)
+                                    {
+                                        <span class="badge bg-secondary">Removed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Live</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    @if (p.IsAvailable)
+                                    {
+                                        <form asp-action="RemoveProduct" asp-route-id="@p.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button class="btn btn-sm btn-outline-danger">Remove</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

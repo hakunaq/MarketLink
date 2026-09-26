@@ -1,0 +1,48 @@
+@model List<Favorite>
+@{
+    ViewData["Title"] = "Favorites";
+    var farmerFavs = (List<Favorite>)ViewBag.Farmers;
+}
+<h2 class="section-title mb-3"><i class="bi bi-heart-fill text-danger me-2"></i>My Favorites</h2>
+
+<h5 class="fw-bold mb-2">Farmers (@farmerFavs.Count)</h5>
+@if (farmerFavs.Count == 0)
+{
+    <p class="small text-muted">No favorite farmers yet.</p>
+}
+else
+{
+    <div class="row g-3 mb-4">
+        @foreach (var f in farmerFavs)
+        {
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold mb-0">@f.FarmerProfile?.StallName</h6>
+                            <small class="text-muted">@f.FarmerProfile?.ContactPerson</small>
+                        </div>
+                        <a asp-controller="Farmers" asp-action="Details" asp-route-id="@f.FarmerProfileId" class="btn btn-sm btn-green">Visit</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<h5 class="fw-bold mb-2">Products (@Model.Count)</h5>
+@if (Model.Count == 0)
+{
+    <p class="small text-muted">No favorite products yet.</p>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var fav in Model)
+        {
+            <div class="col-6 col-md-4 col-lg-3">
+                <partial name="_ProductCard" model="fav.Product" />
+            </div>
+        }
+    </div>
+}

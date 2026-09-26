@@ -1,0 +1,101 @@
+@model CustomerDashboardViewModel
+@{
+    ViewData["Title"] = "My Dashboard";
+    var announcements = (List<Announcement>)ViewBag.Announcements;
+}
+<h2 class="section-title mb-3"><i class="bi bi-house-heart me-2"></i>Welcome back!</h2>
+
+@foreach (var a in announcements)
+{
+    <div class="alert alert-success small"><strong>@a.Title:</strong> @a.Message</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="ml-stat"><div class="stat-value">@Model.TotalOrders</div><div class="stat-label">Total Orders</div></div></div>
+    <div class="col-6 col-md-3"><div class="ml-stat blue"><div class="stat-value">@Model.ActiveOrders</div><div class="stat-label">Active Orders</div></div></div>
+    <div class="col-6 col-md-3"><div class="ml-stat amber"><div class="stat-value">@Model.FavoriteCount</div><div class="stat-label">Favorites</div></div></div>
+    <div class="col-6 col-md-3">
+        <div class="ml-stat grey d-flex flex-column justify-content-center">
+            <a asp-controller="Products" asp-action="Index" class="text-white text-decoration-none"><i class="bi bi-basket"></i> Shop now</a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="section-title mb-0">Recent orders</h5>
+            <a asp-controller="Orders" asp-action="Index" class="small">View all</a>
+        </div>
+        @if (Model.RecentOrders.Count == 0)
+        {
+            <div class="alert alert-light border small">No orders yet. <a asp-controller="Products" asp-action="Index">Browse products</a>.</div>
+        }
+        else
+        {
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0 align-middle">
+                        <thead class="table-light"><tr><th>Order</th><th>Farmer</th><th>Total</th><th>Status</th></tr></thead>
+                        <tbody>
+                            @foreach (var o in Model.RecentOrders)
+                            {
+                                <tr>
+                                    <td><a asp-controller="Orders" asp-action="Details" asp-route-id="@o.Id">#@o.Id</a></td>
+                                    <td class="small">@o.Farmer?.StallName</td>
+                                    <td class="small">@o.TotalAmount.ToString("0.00")</td>
+                                    <td><partial name="_OrderStatusBadge" model="o.Status" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        <h5 class="section-title mt-4 mb-2">Favorite farmers</h5>
+        @if (Model.FavoriteFarmers.Count == 0)
+        {
+            <p class="small text-muted">Tap the heart on a farmer's stall to save them here.</p>
+        }
+        else
+        {
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var f in Model.FavoriteFarmers)
+                {
+                    <a asp-controller="Farmers" asp-action="Details" asp-route-id="@f.FarmerProfileId"
+                       class="btn btn-light border shadow-sm"><i class="bi bi-heart-fill text-danger"></i> @f.FarmerProfile?.StallName</a>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-5">
+        <h5 class="section-title mb-2">Favorite products</h5>
+        @if (Model.FavoriteProducts.Count == 0)
+        {
+            <p class="small text-muted">Save products you buy often for quick reordering and restock alerts.</p>
+        }
+        else
+        {
+            <div class="list-group mb-4">
+                @foreach (var fav in Model.FavoriteProducts)
+                {
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@fav.ProductId"
+                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span class="small">@fav.Product?.Name <span class="text-muted">(@fav.Product?.Farmer?.StallName)</span></span>
+                        <span class="ml-price small">@fav.Product?.Price.ToString("0.00")</span>
+                    </a>
+                }
+            </div>
+        }
+
+        <h5 class="section-title mb-2">Recommended for you</h5>
+        <div class="row g-2">
+            @foreach (var p in Model.RecommendedProducts)
+            {
+                <div class="col-6"><partial name="_ProductCard" model="p" /></div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,59 @@
+@model List<Order>
+@{
+    ViewData["Title"] = "Pre-orders";
+    string? current = ViewBag.Status;
+    var statuses = (OrderStatus[])ViewBag.Statuses;
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="section-title mb-0"><i class="bi bi-receipt me-2"></i>Pre-orders</h2>
+    <a asp-controller="Farmer" asp-action="Index" class="btn btn-sm btn-light border"><i class="bi bi-arrow-left"></i> Dashboard</a>
+</div>
+
+<div class="mb-3">
+    <a asp-action="Index" class="btn btn-sm @(current == null ? "btn-green" : "btn-light border")">All</a>
+    @foreach (var s in statuses)
+    {
+        <a asp-action="Index" asp-route-status="@s"
+           class="btn btn-sm @(current == s.ToString() ? "btn-green" : "btn-light border")">@s</a>
+    }
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-light border">No orders with this filter.</div>
+}
+else
+{
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead class="table-light">
+                    <tr><th>Order</th><th>Customer</th><th>Pickup</th><th>Items</th><th>Total</th><th>Status</th><th class="text-end">Actions</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">#@o.Id</td>
+                            <td class="small">@(o.Customer?.FullName ?? o.Customer?.Email)</td>
+                            <td class="small">@o.PickupDate.ToString("dd MMM")<br /><span class="text-muted">@o.PickupTimeSlot</span></td>
+                            <td class="small">@o.Items.Sum(i => i.Quantity)</td>
+                            <td class="fw-semibold">@o.TotalAmount.ToString("0.00")</td>
+                            <td><partial name="_OrderStatusBadge" model="o.Status" /></td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@o.Id" class="btn btn-sm btn-light border">Open</a>
+                                @if (o.Status == OrderStatus.Placed)
+                                {
+                                    <form asp-action="Accept" asp-route-id="@o.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn btn-sm btn-success"><i class="bi bi-check2"></i></button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

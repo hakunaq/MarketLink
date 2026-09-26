@@ -1,0 +1,58 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-body p-4">
+                <h3 class="section-title mb-1"><i class="bi bi-box-arrow-in-right me-2"></i>Welcome back</h3>
+                <p class="text-muted small mb-4">Log in to your MarketLink account.</p>
+
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+                <form asp-action="Login" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ReturnUrl" />
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" placeholder="you@example.com" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" placeholder="••••••••" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label asp-for="RememberMe" class="form-check-label"></label>
+                    </div>
+
+                    <button type="submit" class="btn btn-green w-100">Log in</button>
+                </form>
+
+                <hr />
+                <p class="small text-center mb-0">
+                    New here?
+                    <a asp-action="RegisterCustomer">Join as a customer</a> ·
+                    <a asp-action="RegisterFarmer">Sell as a farmer</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="alert alert-light border mt-3 small">
+            <strong>Demo accounts</strong>
+            <div class="mt-1">Admin: admin@marketlink.com / Admin@123</div>
+            <div>Farmer: green@marketlink.com / Farmer@123</div>
+            <div>Customer: customer@marketlink.com / Customer@123</div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

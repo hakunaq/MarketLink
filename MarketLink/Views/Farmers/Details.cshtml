@@ -1,0 +1,127 @@
+@model FarmerProfile
+@using System.Globalization
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@{
+    ViewData["Title"] = Model.StallName;
+    var products = (List<Product>)ViewBag.Products;
+    var reviews = (List<Review>)ViewBag.Reviews;
+    double avg = ViewBag.AverageRating;
+    bool isFav = ViewBag.IsFavorite;
+    var inv = CultureInfo.InvariantCulture;
+    bool canReview = SignInManager.IsSignedIn(User) && User.IsInRole(Roles.Customer);
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a asp-action="Index">Farmers</a></li>
+        <li class="breadcrumb-item active">@Model.StallName</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3"
+                             style="width:60px;height:60px;font-size:1.5rem;font-weight:700">
+                            @Model.StallName.Substring(0, 1)
+                        </div>
+                        <div>
+                            <h3 class="mb-0 fw-bold">@Model.StallName</h3>
+                            <div class="text-muted small"><i class="bi bi-person me-1"></i>@Model.ContactPerson</div>
+                            <div class="star small">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="bi @(i <= Math.Round(avg) ? "bi-star-fill" : "bi-star")"></i>
+                                }
+                                <span class="text-muted">@(avg > 0 ? avg.ToString("0.0") + " / 5" : "No reviews yet")</span>
+                            </div>
+                        </div>
+                    </div>
+                    @if (canReview)
+                    {
+                        <form asp-controller="Customer" asp-action="ToggleFavoriteFarmer" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="farmerId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                            <button class="btn btn-sm @(isFav ? "btn-danger" : "btn-outline-danger")">
+                                <i class="bi @(isFav ? "bi-heart-fill" : "bi-heart")"></i> @(isFav ? "Saved" : "Save")
+                            </button>
+                        </form>
+                    }
+                </div>
+                <p class="mt-3 mb-0">@Model.Bio</p>
+            </div>
+        </div>
+
+        <h5 class="section-title mb-3">Current stock (@products.Count)</h5>
+        @if (products.Count == 0)
+        {
+            <div class="alert alert-warning">This farmer has no available products right now.</div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var p in products)
+                {
+                    <div class="col-6 col-md-4">
+                        <partial name="_ProductCard" model="p" />
+                    </div>
+                }
+            </div>
+        }
+
+        <h5 class="section-title mt-4 mb-3">Market schedule</h5>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle">
+                <thead class="table-light"><tr><th>Market</th><th>Day</th><th>Pickup window</th><th>Stall</th></tr></thead>
+                <tbody>
+                    @foreach (var fm in Model.FarmerMarkets)
+                    {
+                        <tr>
+                            <td>@fm.Market?.Name</td>
+                            <td>@fm.OperatingDay</td>
+                            <td>@fm.PickupStartTime – @fm.PickupEndTime</td>
+                            <td>@(fm.StallNumber ?? "-")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <h5 class="section-title mt-4 mb-3">Reviews (@reviews.Count)</h5>
+        @if (canReview)
+        {
+            <a asp-controller="Reviews" asp-action="Create" asp-route-farmerProfileId="@Model.Id"
+               class="btn btn-sm btn-outline-success mb-3"><i class="bi bi-star"></i> Write a review</a>
+        }
+        <partial name="_ReviewList" model="reviews" />
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-geo-alt text-success me-1"></i>Pickup location</h6>
+                <div id="farmer-map" class="ml-map ml-map-sm"></div>
+                <p class="small text-muted mt-2 mb-2">@Model.AddressText</p>
+                <a class="btn btn-sm btn-outline-secondary w-100" target="_blank" rel="noopener"
+                   href="https://www.openstreetmap.org/directions?to=@Model.Latitude.ToString(inv),@Model.Longitude.ToString(inv)">
+                    <i class="bi bi-signpost-2 me-1"></i>Directions
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        initLeafletMap("farmer-map", [
+            {
+                lat: @Model.Latitude.ToString(inv), lng: @Model.Longitude.ToString(inv),
+                title: "@Model.StallName", subtitle: "@Model.AddressText", icon: "bi-geo-alt-fill", color: "#fb8c00"
+            }
+        ]);
+    </script>
+}

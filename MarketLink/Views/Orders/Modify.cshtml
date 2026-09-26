@@ -1,0 +1,55 @@
+@model Order
+@{
+    ViewData["Title"] = "Modify Order #" + Model.Id;
+}
+<h2 class="section-title mb-3"><i class="bi bi-pencil-square me-2"></i>Modify Order #@Model.Id</h2>
+
+<div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+<form asp-action="Modify" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light"><tr><th>Item</th><th>Available</th><th style="width:140px">Quantity</th><th>Price</th></tr></thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                var available = (item.Product?.StockQuantity ?? 0) + item.Quantity;
+                                <tr>
+                                    <td>@item.Product?.Name</td>
+                                    <td class="small text-muted">up to @available @item.Product?.Unit</td>
+                                    <td>
+                                        <input type="number" name="quantities[@item.Id]" value="@item.Quantity"
+                                               min="1" max="@available" class="form-control form-control-sm" />
+                                    </td>
+                                    <td>@item.UnitPrice.ToString("0.00")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <p class="small text-muted mt-2">Set a quantity to a lower number to reduce, or remove an item entirely by cancelling and re-ordering.</p>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Pickup date</label>
+                        <input type="date" name="pickupDate" value="@Model.PickupDate.ToString("yyyy-MM-dd")"
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Note for farmer</label>
+                        <textarea name="note" class="form-control" rows="2">@Model.CustomerNote</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-green w-100">Save changes</button>
+                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-light border w-100 mt-2">Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

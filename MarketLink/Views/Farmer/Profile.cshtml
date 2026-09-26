@@ -1,0 +1,98 @@
+@model FarmerProfile
+@using System.Globalization
+@{
+    ViewData["Title"] = "Edit Profile";
+    var inv = CultureInfo.InvariantCulture;
+}
+<h2 class="section-title mb-3"><i class="bi bi-pencil-square me-2"></i>Edit Stall Profile</h2>
+
+<div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+<form asp-action="Profile" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Business details</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="StallName" class="form-label"></label>
+                            <input asp-for="StallName" class="form-control" />
+                            <span asp-validation-for="StallName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ContactPerson" class="form-label"></label>
+                            <input asp-for="ContactPerson" class="form-control" />
+                            <span asp-validation-for="ContactPerson" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ContactNumber" class="form-label"></label>
+                            <input asp-for="ContactNumber" class="form-control" />
+                            <span asp-validation-for="ContactNumber" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ProfileImageUrl" class="form-label">Profile image URL</label>
+                            <input asp-for="ProfileImageUrl" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Bio" class="form-label">About your stall</label>
+                            <textarea asp-for="Bio" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="AddressText" class="form-label"></label>
+                            <input asp-for="AddressText" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-geo-alt text-success me-1"></i>Pickup location</h6>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label asp-for="Latitude" class="form-label"></label>
+                            <input asp-for="Latitude" id="lat" class="form-control" step="0.000001" />
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Longitude" class="form-label"></label>
+                            <input asp-for="Longitude" id="lng" class="form-control" step="0.000001" />
+                        </div>
+                    </div>
+                    <button type="button" id="use-my-location" class="btn btn-sm btn-outline-success mt-2">
+                        <i class="bi bi-crosshair"></i> Use my current location
+                    </button>
+                    <div id="profile-map" class="ml-map ml-map-sm mt-3"></div>
+                    <p class="small text-muted mt-2 mb-0">Drag is not required — enter coordinates or use your current location. Shown to customers via OpenStreetMap.</p>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-green w-100">Save profile</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let lat = @Model.Latitude.ToString(inv);
+        let lng = @Model.Longitude.ToString(inv);
+        if (!lat && !lng) { lat = 12.9716; lng = 77.5946; }
+
+        const map = initLeafletMap("profile-map", [{ lat: lat, lng: lng, title: "Your stall", icon: "bi-geo-alt-fill", color: "#fb8c00" }], [lat, lng]);
+
+        document.getElementById("use-my-location").addEventListener("click", () => {
+            if (!navigator.geolocation) { alert("Geolocation is not supported by your browser."); return; }
+            navigator.geolocation.getCurrentPosition(pos => {
+                document.getElementById("lat").value = pos.coords.latitude.toFixed(6);
+                document.getElementById("lng").value = pos.coords.longitude.toFixed(6);
+                if (map) {
+                    map.setView([pos.coords.latitude, pos.coords.longitude], 15);
+                }
+            }, () => alert("Could not get your location."));
+        });
+    </script>
+}

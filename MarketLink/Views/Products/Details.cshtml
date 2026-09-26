@@ -1,0 +1,141 @@
+@model Product
+@using System.Globalization
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@{
+    ViewData["Title"] = Model.Name;
+    var reviews = (List<Review>)ViewBag.Reviews;
+    double avg = ViewBag.AverageRating;
+    bool isFav = ViewBag.IsFavorite;
+    var related = (List<Product>)ViewBag.Related;
+    var inv = CultureInfo.InvariantCulture;
+    bool canBuy = SignInManager.IsSignedIn(User) && User.IsInRole(Roles.Customer);
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a asp-action="Index">Products</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index" asp-route-categoryId="@Model.CategoryId">@Model.Category?.Name</a></li>
+        <li class="breadcrumb-item active">@Model.Name</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/img/products/placeholder.svg" : Model.ImageUrl)"
+                             class="img-fluid rounded" alt="@Model.Name" />
+                    </div>
+                    <div class="col-md-7">
+                        <span class="ml-badge-cat">@Model.Category?.Name</span>
+                        <h3 class="fw-bold mt-2">@Model.Name</h3>
+                        <div class="star small mb-2">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="bi @(i <= Math.Round(avg) ? "bi-star-fill" : "bi-star")"></i>
+                            }
+                            <span class="text-muted">@(avg > 0 ? avg.ToString("0.0") + " / 5 (" + reviews.Count + ")" : "No reviews yet")</span>
+                        </div>
+                        <p class="fs-4 ml-price mb-1">@Model.Price.ToString("0.00") <small class="text-muted fs-6">/ @Model.Unit</small></p>
+                        <p class="small text-muted mb-3">
+                            @if (Model.IsSoldOut)
+                            {
+                                <span class="badge bg-secondary">Sold out</span>
+                            }
+                            else if (!Model.IsAvailable)
+                            {
+                                <span class="badge bg-warning text-dark">Temporarily unavailable</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">@Model.StockQuantity @Model.Unit in stock</span>
+                            }
+                        </p>
+                        <p>@Model.Description</p>
+
+                        @if (canBuy && Model.IsAvailable && !Model.IsSoldOut)
+                        {
+                            <form asp-controller="Cart" asp-action="Add" method="post" class="d-flex gap-2 align-items-center">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="productId" value="@Model.Id" />
+                                <div class="input-group" style="width:120px">
+                                    <span class="input-group-text">Qty</span>
+                                    <input type="number" name="quantity" value="1" min="1" max="@Model.StockQuantity" class="form-control" />
+                                </div>
+                                <button class="btn btn-green"><i class="bi bi-cart-plus"></i> Add to cart</button>
+                            </form>
+                        }
+                        @if (canBuy)
+                        {
+                            <form asp-controller="Customer" asp-action="ToggleFavoriteProduct" method="post" class="mt-2">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="productId" value="@Model.Id" />
+                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                <button class="btn btn-sm @(isFav ? "btn-danger" : "btn-outline-danger")">
+                                    <i class="bi @(isFav ? "bi-heart-fill" : "bi-heart")"></i> @(isFav ? "Saved to favorites" : "Save to favorites")
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="section-title mt-4 mb-3">Reviews (@reviews.Count)</h5>
+        @if (canBuy)
+        {
+            <a asp-controller="Reviews" asp-action="Create" asp-route-productId="@Model.Id"
+               class="btn btn-sm btn-outline-success mb-3"><i class="bi bi-star"></i> Write a review</a>
+        }
+        <partial name="_ReviewList" model="reviews" />
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-2"><i class="bi bi-shop text-success me-1"></i>Sold by</h6>
+                <h6>@Model.Farmer?.StallName</h6>
+                <p class="small text-muted mb-2">@Model.Farmer?.Bio</p>
+                <a asp-controller="Farmers" asp-action="Details" asp-route-id="@Model.FarmerProfileId"
+                   class="btn btn-sm btn-green">Visit stall</a>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-2"><i class="bi bi-calendar-week text-success me-1"></i>Pickup schedule</h6>
+                @if (Model.Farmer?.FarmerMarkets?.Count > 0)
+                {
+                    <ul class="list-unstyled small mb-0">
+                        @foreach (var fm in Model.Farmer.FarmerMarkets)
+                        {
+                            <li class="mb-1">
+                                <strong>@fm.Market?.Name</strong> — @fm.OperatingDay,
+                                @fm.PickupStartTime–@fm.PickupEndTime @(string.IsNullOrEmpty(fm.StallNumber) ? "" : "(" + fm.StallNumber + ")")
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="small text-muted mb-0">Contact the farmer for pickup details.</p>
+                }
+            </div>
+        </div>
+
+        @if (related.Count > 0)
+        {
+            <h6 class="fw-bold mb-2">You may also like</h6>
+            <div class="row g-2">
+                @foreach (var p in related)
+                {
+                    <div class="col-6">
+                        <partial name="_ProductCard" model="p" />
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

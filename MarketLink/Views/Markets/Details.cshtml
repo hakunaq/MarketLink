@@ -1,0 +1,72 @@
+@model Market
+@{
+    ViewData["Title"] = Model.Name;
+    var farmers = (List<FarmerProfile>)ViewBag.Farmers;
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a asp-action="Index">Markets</a></li>
+        <li class="breadcrumb-item active">@Model.Name</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <h2 class="section-title mb-3"><i class="bi bi-shop me-2"></i>@Model.Name</h2>
+        <div class="card mb-3">
+            <div class="card-body">
+                <p class="mb-1"><i class="bi bi-geo-alt text-success me-2"></i>@Model.Address</p>
+                <p class="mb-1"><i class="bi bi-calendar-week text-success me-2"></i>@Model.OperatingDays</p>
+                <p class="mb-0"><i class="bi bi-clock text-success me-2"></i>@Model.OpenTime – @Model.CloseTime</p>
+            </div>
+        </div>
+
+        <h5 class="section-title mb-3">Farmers at this market (@farmers.Count)</h5>
+        @if (farmers.Count == 0)
+        {
+            <div class="alert alert-warning">No approved farmers are scheduled at this market yet.</div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var f in farmers)
+                {
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="fw-bold">@f.StallName</h6>
+                                <p class="small text-muted mb-1"><i class="bi bi-person me-1"></i>@f.ContactPerson</p>
+                                <p class="small mb-2">@f.Bio</p>
+                                <a asp-controller="Farmers" asp-action="Details" asp-route-id="@f.Id"
+                                   class="btn btn-sm btn-green">View stall & stock</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    <div class="col-lg-5">
+        <h5 class="section-title mb-3">Location</h5>
+        <div id="market-map" class="ml-map"></div>
+        <a class="btn btn-outline-secondary btn-sm mt-2 w-100" target="_blank" rel="noopener"
+           href="https://www.openstreetmap.org/directions?to=@Model.Latitude,@Model.Longitude">
+            <i class="bi bi-signpost-2 me-1"></i>Get directions to this market
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        initLeafletMap("market-map", [
+            {
+                lat: @Model.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                lng: @Model.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                title: "@Model.Name",
+                subtitle: "@Model.Address",
+                icon: "bi-shop",
+                link: "https://www.openstreetmap.org/?mlat=@Model.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)&mlon=@Model.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)#map=17/@Model.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)/@Model.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+            }
+        ]);
+    </script>
+}

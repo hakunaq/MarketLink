@@ -1,0 +1,83 @@
+@model List<CartItem>
+@{
+    ViewData["Title"] = "Your Cart";
+    decimal total = ViewBag.Total;
+}
+<h2 class="section-title mb-3"><i class="bi bi-cart3 me-2"></i>Your Cart</h2>
+
+@if (Model.Count == 0)
+{
+    <div class="text-center py-5">
+        <i class="bi bi-cart-x display-1 text-muted"></i>
+        <p class="text-muted mt-2">Your cart is empty.</p>
+        <a asp-controller="Products" asp-action="Index" class="btn btn-green">Browse products</a>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr><th>Item</th><th>Farmer</th><th style="width:130px">Qty</th><th>Price</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/img/products/placeholder.svg" : item.ImageUrl)"
+                                                 style="width:46px;height:46px;object-fit:cover;border-radius:.4rem" class="me-2" />
+                                            <div>
+                                                <div class="fw-semibold small">@item.ProductName</div>
+                                                <div class="text-muted small">@item.UnitPrice.ToString("0.00") / @item.Unit</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="small text-muted">@item.FarmerName</td>
+                                    <td>
+                                        <form asp-action="Update" method="post" class="d-flex gap-1">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <input type="number" name="quantity" value="@item.Quantity" min="0" max="@item.StockQuantity"
+                                                   class="form-control form-control-sm" />
+                                            <button class="btn btn-sm btn-light border"><i class="bi bi-arrow-clockwise"></i></button>
+                                        </form>
+                                    </td>
+                                    <td class="fw-semibold">@item.LineTotal.ToString("0.00")</td>
+                                    <td>
+                                        <form asp-action="Remove" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <form asp-action="Clear" method="post" class="mt-2">
+                @Html.AntiForgeryToken()
+                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-x-circle"></i> Clear cart</button>
+            </form>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="fw-bold">Order summary</h5>
+                    <div class="d-flex justify-content-between mb-1"><span>Items</span><span>@Model.Sum(i => i.Quantity)</span></div>
+                    <div class="d-flex justify-content-between mb-3"><span>Payment</span><span class="badge bg-info text-dark">At pickup</span></div>
+                    <hr />
+                    <div class="d-flex justify-content-between fs-5 fw-bold mb-3"><span>Total</span><span>@total.ToString("0.00")</span></div>
+                    <a asp-action="Checkout" class="btn btn-green w-100">Proceed to checkout <i class="bi bi-arrow-right"></i></a>
+                    <p class="small text-muted mt-2 mb-0">No online payment — you pay the farmer when you collect.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
